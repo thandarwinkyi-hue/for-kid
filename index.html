@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ဓမ္မပဒ၊ ၅၅၀နှင့် တရားကောင်းများ</title>
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Myanmar:wght@400;700&display=swap');
+
+    #reader-card {
+        font-family: 'Noto Sans Myanmar', 'Pyidaungsu', sans-serif !important;
+    }
+
+    :root {
+        --sidebar-width: 280px;
+        --bg-body: #f0f0f0; --bg-card: #ffffff; --text-main: #2c3e50; --topbar-bg: #2c3e50; --hr-color: #eee;
+    }
+    
+    body.sepia-mode { --bg-body: #f1e7d0; --bg-card: #fdf6e3; --text-main: #5b4636; --topbar-bg: #5b4636; --hr-color: #dcd3bc; }
+    body.dark-mode { --bg-body: #121212; --bg-card: #1e1e1e; --text-main: #d1d1d1; --topbar-bg: #000000; --hr-color: #333; }
+
+    body { 
+        font-family: 'Pyidaungsu', 'Sagar', sans-serif; 
+        background-color: var(--bg-body); color: var(--text-main); 
+        margin: 0; display: flex; height: 100vh; overflow: hidden; transition: background 0.3s;
+    }
+
+    .top-bar {
+        position: fixed; top: 0; left: 0; right: 0;
+        min-height: 55px; height: auto; 
+        background: var(--topbar-bg);
+        padding: 8px 12px; z-index: 1000;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .nav-row {
+        display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
+    }
+
+    .btn-group {
+        display: flex; gap: 5px; align-items: center; flex-wrap: wrap; justify-content: flex-end;
+    }
+    .theme-dots { display: flex; gap: 6px; margin: 0 5px; }
+    .dot { width: 20px; height: 20px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.4); cursor: pointer; }
+    
+    .btn-icon {
+        background: rgba(255,255,255,0.15); border: none; color: white;
+        padding: 5px 8px; border-radius: 6px; font-size: 13px; cursor: pointer; white-space: nowrap;
+    }
+    .btn-back { background: rgba(255, 255, 255, 0.25); font-weight: bold; }
+
+    /* Bookmark Sidebar သီးသန့် */
+    #sidebar { 
+        width: var(--sidebar-width); background: #2c3e50; color: white; 
+        position: fixed; left: -280px; top: 0; bottom: 0;
+        transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 2000;
+        overflow-y: auto; padding: 20px; box-sizing: border-box;
+    }
+    #sidebar.active { left: 0; box-shadow: 5px 0 15px rgba(0,0,0,0.3); }
+    #sidebar h3 { color: #f1c40f; font-size: 18px; margin: 25px 0 10px; border-bottom: 1px solid #444; padding-bottom: 5px; }
+    #sidebar ul { list-style: none; padding: 0; margin: 0; }
+    #sidebar li { 
+        padding: 14px; cursor: pointer; border-bottom: 1px solid #34495e; 
+        display: flex; justify-content: space-between; align-items: center; font-size: 15px;
+    }
+    #sidebar li:active { background: #3e5871; }
+    .del-mark { color: #ff7675; padding: 5px; font-weight: bold; }
+
+    /* Pop-up Modal (မာတိကာ အတွက်) */
+    .modal {
+        display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%;
+        background-color: rgba(0,0,0,0.6); justify-content: center; align-items: center;
+        backdrop-filter: blur(2px);
+    }
+    .modal.active { display: flex; }
+    .modal-content {
+        background-color: var(--bg-card); color: var(--text-main);
+        width: 90%; max-width: 450px; max-height: 80vh; border-radius: 12px;
+        display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+    .modal-header {
+        padding: 15px 20px; background: var(--topbar-bg); color: white;
+        display: flex; justify-content: space-between; align-items: center; font-size: 18px; font-weight: bold;
+    }
+    .close-btn { background: none; border: none; color: white; font-size: 22px; cursor: pointer; padding: 0; }
+    .modal-body { padding: 15px 20px; overflow-y: auto; }
+    .modal-body h3 { color: #d35400; font-size: 18px; margin: 15px 0 10px; border-bottom: 1px solid var(--hr-color); padding-bottom: 5px; }
+    body.dark-mode .modal-body h3 { color: #f39c12; }
+    .modal-body ul { list-style: none; padding: 0; margin: 0; }
+    .modal-body li { padding: 12px 0; border-bottom: 1px dashed var(--hr-color); cursor: pointer; font-size: 16px; }
+    .modal-body li:hover { opacity: 0.7; }
+    .modal-body li:last-child { border-bottom: none; }
+
+    /* Main Reader Container */
+    #main-content { 
+        flex-grow: 1; overflow-y: auto; width: 100%; height: 100dvh; 
+        padding-top: 110px; padding-bottom: 200px; box-sizing: border-box;
+        scroll-behavior: smooth; -webkit-overflow-scrolling: touch;
+    }
+    #reader-card { 
+        max-width: 800px; margin: 20px auto; background: var(--bg-card); 
+        padding: 25px; padding-bottom: 100px; border-radius: 12px; 
+        min-height: 80vh; box-shadow: 0 2px 10px rgba(0,0,0,0.05); box-sizing: border-box;
+    }
+
+    #content { font-size: 20px; line-height: 1.8; text-align: justify; word-wrap: break-word; }
+    #content a { text-decoration: none !important; color: inherit !important; border-bottom: 1px dashed #999; }
+    table, .mw-editsection, .navbox, .infobox, .ws-header, .headerContainer { display: none !important; }
+    hr { border: 0; border-top: 1px solid var(--hr-color); margin: 20px 0; }
+
+    #overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1500; }
+    #overlay.active { display: block; }
+
+    @media (max-width: 600px) {
+        #reader-card { margin: 10px; padding: 20px; border-radius: 0; }
+        #content { font-size: 19px; }
+    }
+
+    @media print {
+        .top-bar, #sidebar, #overlay, .modal { display: none !important; }
+        @page { margin: 20mm 15mm 20mm 25mm; }
+        body, #main-content { background: white !important; color: black !important; height: auto !important; overflow: visible !important; padding: 0 !important; margin: 0 !important; }
+        #reader-card { box-shadow: none !important; margin: 0 !important; padding: 0 !important; }
+        #content { font-size: 16pt !important; }
+    }
+    </style>
+</head>
+<body class="sepia-mode">
+
+<div id="overlay" onclick="closeSidebar()"></div>
+
+<div class="top-bar">
+    <div class="nav-row">
+        <button class="btn-icon btn-back" onclick="goBack()">⬅ ပြန်ထွက်</button>
+        <div class="btn-group">
+            <button class="btn-icon" onclick="openPopup()">☰ မာတိကာ</button>
+            <button class="btn-icon" onclick="openSidebar()">🔖 မှတ်စုများ</button> 
+            <button class="btn-icon" onclick="saveThisPage()">⭐ သိမ်းမယ်</button>
+            <button class="btn-icon" onclick="exportPDF()">🖨️ ပရင့်</button>
+            <div class="theme-dots">
+                <div class="dot" style="background:#fff;" onclick="setTheme('light')"></div>
+                <div class="dot" style="background:#fdf6e3;" onclick="setTheme('sepia')"></div>
+                <div class="dot" style="background:#1e1e1e;" onclick="setTheme('dark')"></div>
+            </div>
+            <button class="btn-icon" onclick="adjustFont(2)">A+</button>
+            <button class="btn-icon" onclick="adjustFont(-2)">A-</button>
+        </div>
+    </div>
+</div>
+
+<nav id="sidebar">
+    <h2 style="font-size: 20px; margin-top: 0;">မှတ်စုစာအုပ်</h2>
+    <h3>⭐ မှတ်သားထားသည်များ</h3>
+    <ul id="bookmark-list"></ul>
+</nav>
+
+<div id="toc-popup" class="modal" onclick="if(event.target == this) closePopup()">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span>📚 မာတိကာ</span>
+            <button class="close-btn" onclick="closePopup()">✕</button>
+        </div>
+        <div class="modal-body">
+            <h3>📖 ဓမ္မစာပေ </h3>
+            <ul id="menu-list"></ul>
+
+            <h3>🌍 ဗဟုသုတ </h3>
+            <ul id="wiki-menu-list"></ul>
+        </div>
+    </div>
+</div>
+
+<main id="main-content">
+    <article id="reader-card">
+        <h2 id="title-display" style="margin-top: 0;">ဓမ္မအသိတိုးပွားပါစေ🙏🙏🙏</h2>
+        <hr>
+        <div id="content">မာတိကာမှ ဖတ်လိုသော အကြောင်းအရာကို ရွေးချယ်ပါ။</div>
+        <div style="height: 150px; width: 100%;"></div> 
+    </article>
+</main>
+
+<script>
+    const myLinks = [
+        "ပုံတော်စုံ ငါးရာငါးဆယ် ဇာတ်ဝတ္ထု", "ဓမ္မပဒဝတ္ထုတော်ကြီး", "ဓမ္မပဒဂါထာနိဿယ",
+        "ဓမ္မပဒဝတ္ထုတော်ကြီး (ပဌမတွဲ)", "ဓမ္မပဒဝတ္ထုတော်ကြီး (ဒုတိယတွဲ)",
+        "သရုပ်ပြဓမ္မပဒကျမ်း/သရုပ်ပြဓမ္မပဒကျမ်း နိဒါန်း", "သရုပ်ပြဓမ္မပဒကျမ်း","မဟာဗုဒ္ဓဝင်"];
+/*        "ဓမ္မစကြာသုတ်နိဿယ","မဟာသတိပဋ္ဌာနသုတ် နိဿယ","သတိပဋ္ဌာန်အရသာ","ဘာဝနာအရသာ","မဟာဓမ္မစကြာအရသာ",
+ //       "စာရေးသူ:အရှင်ဇနကာဘိဝံသ", "ဗုဒ္ဓဘာသာကောင်းတစ်ယောက်", "ဗုဒ္ဓဘာသာကောင်းတစ်ယောက်-ဒု",
+ //       "ဗုဒ္ဓဘာသာလက်စွဲကျမ်း ပထမတွဲ", "ဗုဒ္ဓဘာသာလက်စွဲကျမ်း ပထမတွဲ-ဒု",
+ //       "ဗုဒ္ဓဘာသာလက်စွဲကျမ်း ဒုတိယတွဲ", "ဗုဒ္ဓဘာသာလက်စွဲကျမ်း ဒုတိယတွဲ-ဒု",
+ //       "ပါဠိဖတ်နည်း", "ပရိတ်ကြီး နိဿယသစ်", "ပရိတ်ကြီးနိဿယသစ်",
+ //       "ပရိတ်ကြီးနိဿယသစ်-ဒု", "ပစ္စယုဒ္ဒေသ -တိကပဋ္ဌာန်း", "ပဉှာဝါရ",
+ //       "သလ္လေခသုတ် တရားတော်ကြီး", "သလ္လေခသုတ် တရားတော်ကြီး-ဒု","သုံးပုံတံတားကျမ်း","သုံးပုံလှေခါးကျမ်း","ပိဋကတ်ဝတ္ထုလမ်းညွှန်","ပိဋကတ်ဝတ္ထုလမ်းညွှန်-ဒု","ပိဋကတ်ဝတ္ထုလမ်းညွှန်-တ","သုတေသနသရုပ်ပြအဘိဓာန်","သုတေသနသရုပ်ပြအဘိဓာန်-ဒု","ပိဋကလမ်းညွှန်-ကခဂဃင","ပိဋကလမ်းညွှန်-စဆဇဈည","ပိဋကလမ်းညွှန်-ဋဌဍဎဏတထဒဓန","ပိဋကလမ်းညွှန်-ပဖဗဘမ","ပိဋကလမ်းညွှန်-ယရလဝ","ပိဋကလမ်းညွှန်-သဟဠ","ပိဋကလမ်းညွှန်-အ","ပိဋကတ်သုံးပုံ သရုပ်စုံအဘိဓာန်-ကခဂဃင","ပိဋကတ်သုံးပုံ သရုပ်စုံအဘိဓာန်-စဆဇဈည","ပိဋကတ်သုံးပုံ သရုပ်စုံအဘိဓာန်-တထဒဓန","ပိဋကတ်သုံးပုံ သရုပ်စုံအဘိဓာန်-ပဖဗဘမ","ပိဋကတ်သုံးပုံ သရုပ်စုံအဘိဓာန်-ယရလဝသ","ပိဋကတ်သုံးပုံ သရုပ်စုံအဘိဓာန်-ဟဠအ"
+    ];*/
+   const customDisplayNames = { "မဟာဗုဒ္ဓဝင်":"မဟာဗုဒ္ဓဝင် - မင်းကွန်းဆရာတော်ဘုရားကြီး"
+    };
+    const wikipediaLinks = [];
+    let currentActiveTitle = "";
+    let fontSize = 20;
+    let currentSource = "wikisource"; 
+    /* Bookmark Sidebar ဖွင့်/ပိတ် */
+    function openSidebar() { document.getElementById('sidebar').classList.add('active'); document.getElementById('overlay').classList.add('active'); }
+    function closeSidebar() { document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); }
+    /* Pop-up Modal ဖွင့်/ပိတ် */
+    function openPopup() { document.getElementById('toc-popup').classList.add('active'); }
+    function closePopup() { document.getElementById('toc-popup').classList.remove('active'); }
+    function setTheme(m) {
+        document.body.classList.remove('sepia-mode', 'dark-mode');
+        if(m !== 'light') document.body.classList.add(m + '-mode');
+    }
+    function adjustFont(s) {
+        fontSize += s;
+        fontSize = Math.max(14, Math.min(40, fontSize));
+        document.getElementById('content').style.fontSize = fontSize + 'px';
+    }
+    document.getElementById('content').addEventListener('click', function(e) {
+        const link = e.target.closest('a');
+        if (link) {
+            const href = link.getAttribute('href');
+            if (href && href.startsWith('/wiki/')) {
+                e.preventDefault(); 
+                const newTitle = decodeURIComponent(href.replace('/wiki/', ''));
+                loadWiki(newTitle);
+            }
+        }
+    });
+    window.onload = () => {
+        // Pop-up ထဲကို မာတိကာတွေ ထည့်မယ်
+        const menu = document.getElementById('menu-list');
+        myLinks.forEach(t => {
+            let li = document.createElement('li');
+            li.innerText = customDisplayNames[t] || t;
+            li.onclick = () => { loadWiki(t); closePopup(); }; // Pop-up ကို ပိတ်မယ်
+            menu.appendChild(li);
+        });
+
+        const wikiMenu = document.getElementById('wiki-menu-list');
+        wikipediaLinks.forEach(t => {
+            let li = document.createElement('li');
+            li.innerText = customDisplayNames[t] || t;
+            li.onclick = () => { loadWiki(t); closePopup(); }; // Pop-up ကို ပိတ်မယ်
+            wikiMenu.appendChild(li);
+        });
+        
+        renderBookmarks();
+    };
+    window.onpopstate = function(event) {
+        if (event.state && event.state.title) {
+            loadWiki(event.state.title, false);
+        }
+    };
+    async function loadWiki(title, push = true) {
+        currentActiveTitle = title;
+        document.getElementById('title-display').innerText = customDisplayNames[title] || title;
+        
+        const cBox = document.getElementById('content');
+        if (push) {
+            history.pushState({ title: title }, title, "#" + encodeURIComponent(title));
+        }
+
+        const cached = localStorage.getItem('cache_' + title);
+        if (cached) {
+            cBox.innerHTML = cached;
+            document.getElementById('main-content').scrollTop = 0;
+        } else {
+            cBox.innerHTML = "<p style='text-align:center;'>ခဏစောင့်ပါခင်ဗျာ ...</p>";
+        }
+
+        if (wikipediaLinks.includes(title)) {
+            currentSource = "wikipedia";
+        } else if (myLinks.includes(title)) {
+            currentSource = "wikisource";
+        }
+
+        const domain = currentSource === "wikipedia" ? "my.wikipedia.org" : "my.wikisource.org";
+        const api = `https://${domain}/w/api.php?action=parse&page=${encodeURIComponent(title)}&format=json&origin=*&prop=text`;
+        
+        try {
+            const res = await fetch(api);
+            const data = await res.json();
+            
+            if(data.parse) {
+                const p = new DOMParser();
+                const d = p.parseFromString(data.parse.text['*'], 'text/html');
+                d.querySelectorAll('table, .mw-editsection, .ws-header, .headerContainer, .navbox, .infobox').forEach(el => el.remove());
+                const cleanHtml = d.body.innerHTML;
+                
+                cBox.innerHTML = cleanHtml;
+                document.getElementById('main-content').scrollTop = 0;
+
+                try {
+                    localStorage.setItem('cache_' + title, cleanHtml); 
+                } catch (e) { console.warn("Storage full"); }
+
+            } else if (data.error) {
+                cBox.innerHTML = `<p style='text-align:center; color:red;'>ရှာမတွေ့ပါ သို့မဟုတ် Error ဖြစ်နေပါသည်။</p>`;
+            }
+        } catch(e) {
+            if(!cached) cBox.innerHTML = `<p style='text-align:center;'>အင်တာနက်ဖွင့်ပေးပါခင်ဗျာ။</p>`;
+        }
+    }
+    function renderBookmarks() {
+        const bl = document.getElementById('bookmark-list');
+        bl.innerHTML = "";
+        let b = JSON.parse(localStorage.getItem('favs') || "[]");
+        b.forEach(t => {
+            let li = document.createElement('li');
+            li.innerHTML = `<span>${customDisplayNames[t] || t}</span><span class="del-mark" onclick="removeMark(event, '${t}')">✕</span>`;
+            li.onclick = () => { loadWiki(t); closeSidebar(); }; // Sidebar ကို ပိတ်မယ်
+            bl.appendChild(li);
+        });
+    }
+    function exportPDF() { window.print(); }
+    function saveThisPage() {
+        if(!currentActiveTitle) return;
+        let b = JSON.parse(localStorage.getItem('favs') || "[]");
+        if(!b.includes(currentActiveTitle)) { 
+            b.push(currentActiveTitle); 
+            localStorage.setItem('favs', JSON.stringify(b)); 
+            renderBookmarks(); 
+            alert("မှတ်သားပြီးပါပြီ"); 
+        }
+    }
+    function removeMark(e, t) {
+        e.stopPropagation();
+        let b = JSON.parse(localStorage.getItem('favs') || "[]");
+        localStorage.setItem('favs', JSON.stringify(b.filter(x => x !== t)));
+        renderBookmarks();
+    }
+    function goBack() { 
+        if (window.history.length > 1) { 
+            window.history.back(); 
+        } else { 
+            alert("နောက်ပြန်သွားရန် မရှိတော့ပါ။"); 
+        } 
+    }
+</script>
+</body>
+</html>
